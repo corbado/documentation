@@ -1,15 +1,7 @@
 const axios = require("axios");
+const {getClientInfo} = require('./utils_backend');
 
 class CorbadoService {
-    clientInfo = (req) => {
-
-        let clientInfo = {
-            remoteAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
-            userAgent: req.get('user-agent')
-        }
-
-        return clientInfo;
-    };
 
     /**
      Sign up
@@ -20,7 +12,7 @@ class CorbadoService {
 
     // @Route("/api/signup/webauthn/init")
     startSignup = (username) => {
-        return axios.post(proces.env.API_URL + 'webauthn/register/start', {
+        return axios.post(process.env.API_URL + 'webauthn/register/start', {
             username, origin: process.env.ORIGIN, clientInfo: clientInfo()
         });
     };
@@ -47,18 +39,18 @@ class CorbadoService {
 
     emailLinkSend = async (email, templateName, redirect, create, additionalPayload) => {
         let data = {
-            email: email, templateName: templateName, // webauthn_signup_user
-            redirect: process.env.ORIGIN + redirect, create: create, // true
+            email: email,
+            templateName: templateName, // webauthn_signup_user
+            redirect: process.env.ORIGIN + redirect,
+            create: create, // true
             additionalPayload: JSON.stringify(additionalPayload)
         };
 
         let res = await axios.post(process.env.API_URL + "emailLinks", data)
 
-        let response = {
+        return {
             httpStatusCode: res.data.httpStatusCode, message: res.data.message,
         };
-
-        return response;
     };
 
 
@@ -74,13 +66,11 @@ class CorbadoService {
     emailLinkValidate = async (emailLinkID, token) => {
         let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token});
 
-        let response = {
+        return {
             httpStatusCode: res.data.httpStatusCode,
             message: res.data.message,
             additionalPayload: res.data.additionalPayload,
         };
-
-        return response;
     }
 
     webAuthnConfirmDevice = (credentialID, status) => {
@@ -98,7 +88,7 @@ class CorbadoService {
     startLogin = (username) => {
         return axios.post(process.env.API_URL + 'webauthn/authenticate/start', {
             username, origin: process.env.ORIGIN, clientInfo: clientInfo()
-        })
+        });
     };
 
 
