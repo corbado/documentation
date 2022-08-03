@@ -1,18 +1,40 @@
 const axios = require("axios");
 
 class CorbadoService {
-    clientInfo = () => {};
+    clientInfo = (req) => {
 
-    /**
-        Sign up
-     */
+        let clientInfo = {
+            remoteAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+            userAgent: req.get('user-agent')
+        }
 
-    // @Route("/api/signup/webauthn/init")
-    webAuthnRegisterStart = (username) => {
-        return axios.post(proces.env.API_URL + 'webauthn/register/start', {username, origin: process.env.ORIGIN, clientInfo: clientInfo()});
+        return clientInfo;
     };
 
+    /**
+     Sign up
+     */
+
+
+    /* Initialization phase */
+
+    // @Route("/api/signup/webauthn/init")
+    startSignup = (username) => {
+        return axios.post(proces.env.API_URL + 'webauthn/register/start', {
+            username, origin: process.env.ORIGIN, clientInfo: clientInfo()
+        });
+    };
+
+
+    /* Finalization phase */
+
     // @Route("/api/signup/webauthn/finish")
+    finishSignup = async (publicKeyCredential) => {
+        let {data} = await this.webAuthnRegisterFinish(publicKeyCredential);
+        return this.emailLinkSend(data.username, 'webauthn_signup_user', process.env.REDIRECT,
+            true, {credentialID: data.credentialID});
+    }
+
     webAuthnRegisterFinish = async (publicKeyCredential) => {
         let data = {
             publicKeyCredential: JSON.stringify(publicKeyCredential),
@@ -25,61 +47,65 @@ class CorbadoService {
 
     emailLinkSend = async (email, templateName, redirect, create, additionalPayload) => {
         let data = {
-            email: email,
-            templateName: templateName, // webauthn_signup_user
-            redirect: process.env.ORIGIN + redirect,
-            create: create, // true
+            email: email, templateName: templateName, // webauthn_signup_user
+            redirect: process.env.ORIGIN + redirect, create: create, // true
             additionalPayload: JSON.stringify(additionalPayload)
         };
 
         let res = await axios.post(process.env.API_URL + "emailLinks", data)
 
         let response = {
-            httpStatusCode: res.data.httpStatusCode,
-            message: res.data.message,
+            httpStatusCode: res.data.httpStatusCode, message: res.data.message,
         };
 
         return response;
     };
 
+
+    /* Confirmation phase */
+
+    // @Route("process.env.REDIRECT")
+    confirmSignup = async (emailLinkId, token) => {
+        let response = await this.emailLinkValidate(emailLinkId, token);
+        let {credentialId} = JSON.parse(response.additionalPayload);
+        return this.webAuthnConfirmDevice(credentialId, 'active');
+    }
+
     emailLinkValidate = async (emailLinkID, token) => {
-        try {
-            let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token});
+        let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token});
 
-            let response = {
-                httpStatusCode: res.data.httpStatusCode,
-                message: res.data.message,
-                additionalPayload: res.data.additionalPayload,
-            };
+        let response = {
+            httpStatusCode: res.data.httpStatusCode,
+            message: res.data.message,
+            additionalPayload: res.data.additionalPayload,
+        };
 
-            return response;
-        } catch (e) {
-            console.log(e)
-        }
+        return response;
     }
 
-    async confirmUser() {
-        let response = await emailLinkValidate(emailLinkId, token);
-        let { credentialId } = JSON.parse(response.additionalPayload);
-        webAuthnConfirmDevice(credentialId, 'active');
-    }
-
-    webAuthnConfirmDevice = (credentialId, status) => {
-        return axios.put(process.env.API_URL + `webauthn/credential/${credentialId}`, {status});
+    webAuthnConfirmDevice = (credentialID, status) => {
+        return axios.put(process.env.API_URL + `webauthn/credential/${credentialID}`, {status});
     };
 
 
     /**
-        Login
+     Login
      */
 
+    /* Initialization phase */
+
     // @Route("/api/login/webauthn/start")
-    webAuthnLoginStart = (username) => {
-        return axios.post(process.env.API_URL + 'webauthn/authenticate/start', {username, origin: process.env.ORIGIN, clientInfo: clientInfo()})
+    startLogin = (username) => {
+        return axios.post(process.env.API_URL + 'webauthn/authenticate/start', {
+            username, origin: process.env.ORIGIN, clientInfo: clientInfo()
+        })
     };
 
+
+    /* Finalization phase */
+
     // @Route("/api/login/webauthn/finish")
-    webAuthnLoginFinish = (publicKeyCredential) => {
+    finishLogin = (publicKeyCredential) => {
         let data = {
             publicKeyCredential: JSON.stringify(publicKeyCredential),
             origin: process.env.ORIGIN,
