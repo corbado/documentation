@@ -1,5 +1,4 @@
 const axios = require("axios");
-const {getClientInfo} = require('./utils_backend');
 
 class CorbadoService {
 
