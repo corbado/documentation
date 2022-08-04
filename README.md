@@ -5,7 +5,7 @@
 This repository contains the sample files from the Node.js documentation.
 
 ### Frontend
-- **PasskeyService.js**:contains a frontend service to sign up and login, which mainly communicates with the backend and
+- **PasskeyService.js**: contains a frontend service to sign up and login, which mainly communicates with the backend and
       calls the WebAuthn API
 - **utils_frontend.js**: contains a helper function to check if the user's device can use passkeys
 ### Backend
