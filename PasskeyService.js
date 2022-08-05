@@ -5,9 +5,7 @@ class PasskeyService {
     signUp(email) {
         return axios.post('/api/signup/webauthn/start', {email})
             .then(async ({data}) => {
-                let {publicKeyCredentialCreateOptions} = data;
-                let publicKeyCredential = await create(publicKeyCredentialCreateOptions);
-
+                let publicKeyCredential = await create(data);
                 return axios.post('/api/signup/webauthn/finish', publicKeyCredential);
             });
     }
@@ -15,9 +13,7 @@ class PasskeyService {
     login(email) {
         return axios.post('api/login/webauthn/start', {email})
             .then(async ({data}) => {
-                let {publicKeyCredentialRequestOptions} = data;
-                let publicKeyCredential = await get(publicKeyCredentialRequestOptions);
-
+                let publicKeyCredential = await get(data);
                 return axios.post('/api/login/webauthn/finish', publicKeyCredential);
             })
     }
