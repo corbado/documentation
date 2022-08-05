@@ -11,8 +11,10 @@ class CorbadoService {
 
     // @Route("/api/signup/webauthn/init")
     startSignup = async (username, clientInfo) => {
-        let {data} = axios.post(process.env.API_URL + 'webauthn/register/start', {
-            username, origin: process.env.ORIGIN, clientInfo: clientInfo
+        let {data} = await axios.post(process.env.API_URL + 'webauthn/register/start', {
+            username,
+            origin: process.env.ORIGIN,
+            clientInfo: clientInfo
         });
         return data["publicKeyCredentialCreationOptions"];
     };
@@ -49,7 +51,7 @@ class CorbadoService {
 
     // @Route("/api/login/webauthn/start")
     startLogin = async (username, clientInfo) => {
-        let {data} = axios.post(process.env.API_URL + 'webauthn/authenticate/start', {
+        let {data} = await axios.post(process.env.API_URL + 'webauthn/authenticate/start', {
             username, origin: process.env.ORIGIN, clientInfo: clientInfo
         });
         return data['publicKeyCredentialRequestOptions'];
