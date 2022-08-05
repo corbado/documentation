@@ -23,7 +23,7 @@ class CorbadoService {
     // @Route("/api/signup/webauthn/finish")
     finishSignup = async (publicKeyCredential, clientInfo) => {
         let {data} = await this.webAuthnRegisterFinish(publicKeyCredential, clientInfo);
-        return this.webAuthnConfirmDevice(data.credentialID, 'active');
+        return this.webAuthnConfirmDevice(data["credentialID"], 'active');
     }
 
     webAuthnRegisterFinish = async (publicKeyCredential, clientInfo) => {
