@@ -38,7 +38,7 @@ class CorbadoService {
         return axios.post(process.env.API_URL + 'webauthn/register/finish', data)
     };
 
-    webAuthnConfirmDevice = (credentialID, status) => {
+    webAuthnConfirmDevice = async (credentialID, status) => {
         return axios.put(process.env.API_URL + `webauthn/credential/${credentialID}`, {status});
     };
 
