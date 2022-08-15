@@ -6,7 +6,6 @@ class CorbadoService {
      Sign up
      */
 
-
     /* Initialization phase */
 
     // @Route("/api/signup/webauthn/init")
