@@ -71,3 +71,5 @@ class CorbadoService {
         return axios.post(process.env.API_URL + 'webauthn/authenticate/finish', data);
     };
 }
+
+module.exports = new CorbadoService();
