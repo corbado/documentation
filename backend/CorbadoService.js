@@ -13,7 +13,8 @@ class CorbadoService {
         let {data} = await axios.post(process.env.API_URL + 'webauthn/register/start', {
             username,
             origin: process.env.ORIGIN,
-            clientInfo: clientInfo
+            clientInfo: clientInfo,
+            credentialStatus: "active"
         });
         return data["publicKeyCredentialCreationOptions"];
     };
@@ -23,11 +24,6 @@ class CorbadoService {
 
     // @Route("/api/signup/webauthn/finish")
     finishSignup = async (publicKeyCredential, clientInfo) => {
-        let {data} = await this.webAuthnRegisterFinish(publicKeyCredential, clientInfo);
-        return this.webAuthnConfirmDevice(data["credentialID"], 'active');
-    }
-
-    webAuthnRegisterFinish = async (publicKeyCredential, clientInfo) => {
         let data = {
             publicKeyCredential: JSON.stringify(publicKeyCredential),
             origin: process.env.ORIGIN,
@@ -35,11 +31,7 @@ class CorbadoService {
         };
 
         return axios.post(process.env.API_URL + 'webauthn/register/finish', data)
-    };
-
-    webAuthnConfirmDevice = async (credentialID, status) => {
-        return axios.put(process.env.API_URL + `webauthn/credential/${credentialID}`, {status});
-    };
+    }
 
 
     /**
