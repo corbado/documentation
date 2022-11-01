@@ -15,6 +15,10 @@ class CorbadoService {
             origin: process.env.ORIGIN,
             clientInfo: clientInfo,
             credentialStatus: "active"
+        }, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
         });
         return data["publicKeyCredentialCreationOptions"];
     };
@@ -30,7 +34,11 @@ class CorbadoService {
             clientInfo: clientInfo(),
         };
 
-        return axios.post(process.env.API_URL + 'webauthn/register/finish', data)
+        return axios.post(process.env.API_URL + 'webauthn/register/finish', data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
     }
 
 
@@ -44,6 +52,10 @@ class CorbadoService {
     startLogin = async (username, clientInfo) => {
         let {data} = await axios.post(process.env.API_URL + 'webauthn/authenticate/start', {
             username, origin: process.env.ORIGIN, clientInfo: clientInfo
+        }, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
         });
         return data['publicKeyCredentialRequestOptions'];
     };
@@ -59,7 +71,11 @@ class CorbadoService {
             clientInfo: clientInfo,
         };
 
-        return axios.post(process.env.API_URL + 'webauthn/authenticate/finish', data);
+        return axios.post(process.env.API_URL + 'webauthn/authenticate/finish', data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
     };
 }
 

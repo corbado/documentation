@@ -13,7 +13,11 @@ class CorbadoSmsService {
             create: create,
         };
 
-        let res = await axios.post(process.env.API_URL + "smsCodes", data)
+        let res = await axios.post(process.env.API_URL + "smsCodes", data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         return {
             httpStatusCode: res.data.httpStatusCode,
@@ -29,7 +33,11 @@ class CorbadoSmsService {
 
     // @Route("/api/smsCodeValidate/{smsCodeID}
     smsCodeValidate = async (smsCodeID, smsCode) => {
-        let res = await axios.put(process.env.API_URL + "smsCodes/" + smsCodeID + "/validate", {smsCode});
+        let res = await axios.put(process.env.API_URL + "smsCodes/" + smsCodeID + "/validate", {smsCode}, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         return {
             httpStatusCode: res.data.httpStatusCode,
