@@ -16,7 +16,11 @@ class CorbadoMailService {
             additionalPayload: JSON.stringify(additionalPayload)
         };
 
-        let res = await axios.post(process.env.API_URL + "emailLinks", data)
+        let res = await axios.post(process.env.API_URL + "emailLinks", data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         return {
             httpStatusCode: res.data.httpStatusCode, message: res.data.message,
@@ -30,7 +34,11 @@ class CorbadoMailService {
 
     // @Route("/api/emailLinkValidate/{emailLinkID}")
     emailLinkValidate = async (emailLinkID, token) => {
-        let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token});
+        let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token}, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         return {
             httpStatusCode: res.data.httpStatusCode,

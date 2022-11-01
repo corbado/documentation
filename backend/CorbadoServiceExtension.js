@@ -15,6 +15,10 @@ class CorbadoServiceExtension {
             username,
             origin: process.env.ORIGIN,
             clientInfo: clientInfo
+        }, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
         });
         return data["publicKeyCredentialCreationOptions"];
     };
@@ -40,7 +44,11 @@ class CorbadoServiceExtension {
             clientInfo: clientInfo,
         };
 
-        return axios.post(process.env.API_URL + 'webauthn/register/finish', data);
+        return axios.post(process.env.API_URL + 'webauthn/register/finish', data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
     };
 
     emailLinkSend = async (email, templateName, redirect, create, additionalPayload) => {
@@ -52,7 +60,11 @@ class CorbadoServiceExtension {
             additionalPayload: JSON.stringify(additionalPayload)
         };
 
-        let res = await axios.post(process.env.API_URL + "emailLinks", data)
+        let res = await axios.post(process.env.API_URL + "emailLinks", data, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         let response = {
             httpStatusCode: res.data.httpStatusCode,
@@ -73,7 +85,11 @@ class CorbadoServiceExtension {
     }
 
     emailLinkValidate = async (emailLinkID, token) => {
-        let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token});
+        let res = await axios.put(process.env.API_URL + "emailLinks/" + emailLinkID + "/validate", {token}, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
 
         let response = {
             httpStatusCode: res.data.httpStatusCode,
@@ -85,7 +101,11 @@ class CorbadoServiceExtension {
     }
 
     webAuthnConfirmDevice = (credentialID, status) => {
-        return axios.put(process.env.API_URL + `webauthn/credential/${credentialID}`, {status});
+        return axios.put(process.env.API_URL + `webauthn/credential/${credentialID}`, {status}, {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${process.env.PROJECT_ID}:${process.env.API_SECRET}`).toString('base64')
+            }
+        });
     };
 }
 
